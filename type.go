@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type GeometryPolygon struct {
 	Coordinates [][][]float64 `json:"coordinates" bson:"coordinates"`
-	Type        string        `json:"type" bson:"type"`
+	Type        string        `json:"type,omitempty" bson:"type,omitempty"`
 }
 
 type GeometryLineString struct {

@@ -224,3 +224,69 @@ func GeoWithin(mongoconn *mongo.Database, coordinates [][][]float64) (namalokasi
 	return lokasi.Properties.Name
 
 }
+
+func Near(mongoconn *mongo.Database, long float64, lat float64) (namalokasi string) {
+	lokasicollection := mongoconn.Collection("gis2")
+	filter := bson.M{
+		"geometry": bson.M{
+			"$near": bson.M{
+				"$geometry": bson.M{
+					"type":        "LineString",
+					"coordinates": []float64{long, lat},
+				},
+				"$maxDistance": 1000,
+			},
+		},
+	}
+	var lokasi Lokasi
+	err := lokasicollection.FindOne(context.TODO(), filter).Decode(&lokasi)
+	if err != nil {
+		log.Printf("Near: %v\n", err)
+	}
+	return lokasi.Properties.Name
+
+}
+
+func SetConnection2dsphere(mongoenv, dbname string) *mongo.Database {
+	var DBmongoinfo = atdb.DBInfo{
+		DBString: os.Getenv(mongoenv),
+		DBName:   dbname,
+	}
+	db := atdb.MongoConnect(DBmongoinfo)
+
+	// Create a geospatial index if it doesn't exist
+	indexModel := mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "geometry", Value: "2dsphere"},
+		},
+	}
+
+	_, err := db.Collection("gis2").Indexes().CreateOne(context.TODO(), indexModel)
+	if err != nil {
+		log.Printf("Error creating geospatial index: %v\n", err)
+	}
+
+	return db
+}
+
+func SetConnectionTest2dsphere(mongostring, dbname string) *mongo.Database {
+	var DBmongoinfo = atdb.DBInfo{
+		DBString: mongostring,
+		DBName:   dbname,
+	}
+	db := atdb.MongoConnect(DBmongoinfo)
+
+	// Create a geospatial index if it doesn't exist
+	indexModel := mongo.IndexModel{
+		Keys: bson.D{
+			{Key: "geometry", Value: "2dsphere"},
+		},
+	}
+
+	_, err := db.Collection("gis2").Indexes().CreateOne(context.TODO(), indexModel)
+	if err != nil {
+		log.Printf("Error creating geospatial index: %v\n", err)
+	}
+
+	return db
+}

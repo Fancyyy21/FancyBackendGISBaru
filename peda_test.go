@@ -235,3 +235,9 @@ func TestGeoWithin(t *testing.T) {
 	datagedung := GeoWithin(mconn, coordinates)
 	fmt.Println(datagedung)
 }
+
+func TestNear(t *testing.T) {
+	mconn := SetConnectionTest2dsphere("mongodb+srv://Fancy21:Acermaulana21@maulana.uiq9nmy.mongodb.net/?retryWrites=true&w=majority", "gis")
+	datagedung := Near(mconn, 108.2172977377187, -6.8281903803652)
+	fmt.Println(datagedung)
+}
